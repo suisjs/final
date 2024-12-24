@@ -53,14 +53,14 @@ int main() {
                 if (!jumping) {
                     jumping = 1; // 開始跳躍
                     jumpHeight = 2; // 跳 2 層
-                    jumpTimer = 7; // 跳躍的持續時間
+                    jumpTimer = 3; // 跳躍的持續時間
                 }
             }
             else if (ch == '2') {
                 if (!jumping) {
                     jumping = 1; // 開始跳躍
                     jumpHeight = 3; // 跳 3 層
-                    jumpTimer = 9; // 跳躍的持續時間
+                    jumpTimer = 4; // 跳躍的持續時間
                 }
             }
         }
@@ -80,15 +80,15 @@ int main() {
             jumpTimer--;
         }
 
-        // 檢查是否成功跳過障礙物
-        if (ballHeight == 0 && obstaclePos == 5 && HEIGHT - obstacleHeight == HEIGHT - 1) {
-            score++;  // 成功跳過障礙物，增加分數
-        }
-
-        // 檢查碰到障礙物
-        if (ballHeight == 0 && obstaclePos == 5 && HEIGHT - obstacleHeight >= HEIGHT - ballHeight) {
+        // 檢查碰撞（判定是否 Game Over）
+        if (obstaclePos == 5 && (HEIGHT - ballHeight - 1) >= (HEIGHT - obstacleHeight)) {
             printf("Game Over!\n");
             break; // 結束遊戲
+        }
+
+        // 檢查是否成功跳過障礙物
+        if (obstaclePos == 4 && ballHeight > 0) {
+            score++;  // 成功跳過障礙物，增加分數
         }
 
         // 移動障礙物
@@ -107,4 +107,3 @@ int main() {
 
     return 0;
 }
-
