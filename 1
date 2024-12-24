@@ -1,0 +1,110 @@
+#include <stdio.h>
+#include <conio.h>  // 用於非阻塞鍵盤輸入
+#include <stdlib.h>
+#include <time.h>
+#include <windows.h> // 使用 Sleep 函數
+
+#define WIDTH 30   // 遊戲區域寬度
+#define HEIGHT 10  // 遊戲區域高度
+
+void drawGame(int ballHeight, int obstaclePos, int obstacleHeight, const char* startTime, int score) {
+    system("cls"); // 清屏
+
+    // 顯示遊戲開始時間與分數
+    printf("Game Start Time: %s   Score: %d\n", startTime, score);
+
+    for (int y = 0; y < HEIGHT; y++) {
+        for (int x = 0; x < WIDTH; x++) {
+            if (y == HEIGHT - ballHeight - 1 && x == 5) {
+                printf("O"); // 球的位置
+            }
+            else if (x == obstaclePos && y >= HEIGHT - obstacleHeight) {
+                printf("#"); // 障礙物
+            }
+            else {
+                printf(" ");
+            }
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    int ballHeight = 0;         // 球的高度
+    int obstaclePos = WIDTH - 1; // 障礙物的初始位置
+    int obstacleHeight = (rand() % 2) + 1; // 隨機設定初始障礙物高度（1 或 2 層）
+    int jumping = 0;            // 是否在跳躍
+    int jumpHeight = 0;         // 當前跳躍的高度
+    int jumpTimer = 0;          // 跳躍計時器
+    int score = 0;              // 遊戲分數
+
+    // 獲取遊戲開始時間
+    time_t startTimeRaw = time(NULL); // 取得當前時間的時間戳
+    struct tm* startTimeInfo = localtime(&startTimeRaw); // 轉換為當地時間
+    char startTime[20]; // 存儲格式化後的時間字符串
+    strftime(startTime, sizeof(startTime), "%Y-%m-%d %H:%M:%S", startTimeInfo); // 格式化時間
+
+    srand((unsigned int)time(NULL));
+
+    while (1) {
+        if (_kbhit()) {
+            char ch = _getch();
+            if (ch == '1') {
+                if (!jumping) {
+                    jumping = 1; // 開始跳躍
+                    jumpHeight = 2; // 跳 2 層
+                    jumpTimer = 7; // 跳躍的持續時間
+                }
+            }
+            else if (ch == '2') {
+                if (!jumping) {
+                    jumping = 1; // 開始跳躍
+                    jumpHeight = 3; // 跳 3 層
+                    jumpTimer = 9; // 跳躍的持續時間
+                }
+            }
+        }
+
+        // 更新遊戲邏輯
+        if (jumping) {
+            if (jumpTimer > jumpHeight) {
+                ballHeight = jumpHeight; // 向上跳
+            }
+            else if (jumpTimer > 0) {
+                ballHeight = 0; // 向下落
+            }
+            else {
+                jumping = 0; // 結束跳躍
+                ballHeight = 0; // 回到底部
+            }
+            jumpTimer--;
+        }
+
+        // 檢查是否成功跳過障礙物
+        if (ballHeight == 0 && obstaclePos == 5 && HEIGHT - obstacleHeight == HEIGHT - 1) {
+            score++;  // 成功跳過障礙物，增加分數
+        }
+
+        // 檢查碰到障礙物
+        if (ballHeight == 0 && obstaclePos == 5 && HEIGHT - obstacleHeight >= HEIGHT - ballHeight) {
+            printf("Game Over!\n");
+            break; // 結束遊戲
+        }
+
+        // 移動障礙物
+        obstaclePos--;
+        if (obstaclePos < 0) {
+            obstaclePos = WIDTH - 1;
+            obstacleHeight = (rand() % 2) + 1; // 隨機生成新障礙物高度（1 或 2 層）
+        }
+
+        // 繪製遊戲畫面
+        drawGame(ballHeight, obstaclePos, obstacleHeight, startTime, score);
+
+        // 延遲 (模擬遊戲速度)
+        Sleep(100);
+    }
+
+    return 0;
+}
+
