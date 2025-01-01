@@ -13,8 +13,12 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -23,14 +27,10 @@
               "RelativeDocumentMoniker": "..\\source\\Main.c",
               "ToolTip": "C:\\Users\\user\\OneDrive\\Desktop\\\u7A0B\u5F0F\u5BE6\u7FD2\\final\\2\\source\\Main.c*",
               "RelativeToolTip": "..\\source\\Main.c*",
-              "ViewState": "AgIAAIgAAAAAAAAAAAAowKUAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAI4AAAAAAAAAAAAowKwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
               "WhenOpened": "2024-12-24T13:48:09.269Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
             }
           ]
         }

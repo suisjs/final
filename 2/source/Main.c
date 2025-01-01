@@ -1,29 +1,32 @@
 #include <stdio.h>
-#include <conio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <windows.h>
+#include <conio.h>    // 用於非阻塞鍵盤輸入
+#include <stdlib.h>    // 用於隨機數生成和系統功能
+#include <time.h>      // 用於計時
+#include <windows.h>   // 用於 Sleep 函數
 
-#define WIDTH 30   // 遊戲區域寬度
-#define HEIGHT 10  // 遊戲區域高度
+#define WIDTH 30   // 遊戲區域的寬度
+#define HEIGHT 10  // 遊戲區域的高度
 
+// 繪製遊戲畫面的函式
 void drawGame(int ballHeight, int obstaclePos, int obstaclePattern, double elapsedTime, int score) {
-    system("cls"); // 清屏
+    system("cls"); // 清屏，刷新畫面
 
-    // 顯示遊戲操作提示與分數
-    printf("按1時跳過一層障礙物 (#) 可得分\n");
+    // 顯示提示訊息和遊戲狀態
+    printf("\
+按1時跳過一層障礙物 (#) 可得分\n");
     printf("按2時跳過兩層障礙物 (##) 可得分\n");
     printf("Time: %.2f s   Score: %d\n", elapsedTime, score);
 
+    // 繪製遊戲區域
     for (int y = 0; y < HEIGHT; y++) {
         for (int x = 0; x < WIDTH; x++) {
             if (y == HEIGHT - ballHeight - 1 && x == 5) {
-                printf("O"); // 琴的位置
+                printf("O"); // 繪製玩家的球
             }
             else if (x == obstaclePos) {
-                // 根據障礙物類型繪製
+                // 根據障礙物模式繪製障礙物
                 if (obstaclePattern == 1) {
-                    // 一層障礙物 #
+                    // 一層障礙物 (#)
                     if (y == HEIGHT - 1) {
                         printf("#");
                     }
@@ -32,7 +35,7 @@ void drawGame(int ballHeight, int obstaclePos, int obstaclePattern, double elaps
                     }
                 }
                 else if (obstaclePattern == 2) {
-                    // 兩層障礙物 ##
+                    // 兩層障礙物 (##)
                     if (y == HEIGHT - 1 || y == HEIGHT - 2) {
                         printf("#");
                     }
@@ -42,58 +45,62 @@ void drawGame(int ballHeight, int obstaclePos, int obstaclePattern, double elaps
                 }
             }
             else {
-                printf(" ");
+                printf(" "); // 空白部分
             }
         }
         printf("\n");
     }
 }
 
+// 紀錄遊戲歷史的函式
 void recordHistory(int gameNumber, double elapsedTime, int score) {
     printf("\n[Game %d] Time: %.2f s   Score: %d\n", gameNumber, elapsedTime, score);
 }
 
 int main() {
-    int gameNumber = 0; // 遊戲局數
+    int gameNumber = 0; // 紀錄遊戲局數
 
     while (1) {
-        int ballHeight = 0;         // 琴的高度
+        // 初始化遊戲變數
+        int ballHeight = 0;         // 球的當前高度
         int obstaclePos = WIDTH - 1; // 障礙物的初始位置
         int obstaclePattern = (rand() % 2) + 1; // 隨機生成障礙物模式（1: #, 2: ##）
-        int jumping = 0;            // 是否在跳躍
+        int jumping = 0;            // 是否正在跳躍
         int jumpHeight = 0;         // 當前跳躍的高度
         int jumpTimer = 0;          // 跳躍計時器
-        int score = 0;              // 遊戲分數
-        char playerInput = 0;       // 玩家輸入
+        int score = 0;              // 玩家分數
 
-        // 遊戲開始時間
+        // 紀錄遊戲開始時間
         clock_t startTime = clock();
         gameNumber++;
 
-        srand((unsigned int)time(NULL));
+        srand((unsigned int)time(NULL)); // 初始化隨機數生成器
 
         while (1) {
-            // 計算已經過的時間
+            // 計算遊戲經過的時間
             clock_t currentTime = clock();
             double elapsedTime = (double)(currentTime - startTime) / CLOCKS_PER_SEC;
 
+            // 處理鍵盤輸入
             if (_kbhit()) {
-                playerInput = _getch();
+                char ch = _getch();
+                if (ch == '1') {
+                    if (!jumping) {
+                        jumping = 1;     // 開始跳躍
+                        jumpHeight = 1;  // 設定跳躍高度為 1
+                        jumpTimer = 6;   // 設定跳躍計時器
+                    }
+                }
+                else if (ch == '2') {
+                    if (!jumping) {
+                        jumping = 1;     // 開始跳躍
+                        jumpHeight = 2;  // 設定跳躍高度為 2
+                        jumpTimer = 8;   // 設定跳躍計時器
+                    }
+                }
             }
 
-            // 判斷玩家輸入跳躍
-            if (playerInput == '1' && !jumping) {
-                jumping = 1;  // 開始跳躍
-                jumpHeight = 1; // 跳 1 層
-                jumpTimer = 6; // 跳躍的持續時間
-            }
-            else if (playerInput == '2' && !jumping) {
-                jumping = 1;  // 開始跳躍
-                jumpHeight = 2; // 跳 2 層
-                jumpTimer = 8; // 跳躍的持續時間
-            }
-
-            // 更新遊戲邏輯
+            // 更新跳躍邏輯
             if (jumping) {
                 if (jumpTimer > jumpHeight) {
                     ballHeight = jumpHeight; // 向上跳
@@ -108,11 +115,11 @@ int main() {
                 jumpTimer--;
             }
 
-            // 檢查碰撞（判定是否 Game Over）
-            if (obstaclePos == 5 && (HEIGHT - ballHeight - 1) >= (HEIGHT - 2)) {
+            // 檢查是否 Game Over
+            if (obstaclePos == 5 && (HEIGHT - ballHeight - 1) >= (HEIGHT - obstaclePattern)) {
                 printf("Game Over!\n");
                 printf("Total Time: %.2f seconds\n", elapsedTime);
-                printf("Your Score: %d\n", score);  // 顯示遊戲結束時的分數
+                printf("Your Score: %d\n", score);
 
                 // 紀錄歷史結果
                 recordHistory(gameNumber, elapsedTime, score);
@@ -138,25 +145,25 @@ int main() {
 
             // 檢查是否成功跳過障礙物
             if (obstaclePos == 4 && ballHeight > 0) {
-                if (obstaclePattern == 1 && ballHeight >= 1 && playerInput == '1') {
-                    score++; // 障礙物 # 被成功跳過，按1才得分
+                if (obstaclePattern == 1 && jumpHeight == 1) {
+                    score++; // 單層障礙物被成功跳過
                 }
-                else if (obstaclePattern == 2 && ballHeight >= 2 && playerInput == '2') {
-                    score++; // 障礙物 ## 被成功跳過，按2才得分
+                else if (obstaclePattern == 2 && jumpHeight == 2) {
+                    score++; // 雙層障礙物被成功跳過
                 }
             }
 
             // 移動障礙物
             obstaclePos--;
             if (obstaclePos < 0) {
-                obstaclePos = WIDTH - 1;
-                obstaclePattern = (rand() % 2) + 1; // 隨機生成新障礙物模式
+                obstaclePos = WIDTH - 1;               // 重置障礙物位置
+                obstaclePattern = (rand() % 2) + 1;    // 隨機生成新障礙物模式
             }
 
             // 繪製遊戲畫面
             drawGame(ballHeight, obstaclePos, obstaclePattern, elapsedTime, score);
 
-            // 延遲 (模擬遊戲速度)
+            // 延遲，模擬遊戲速度
             Sleep(100);
         }
     }
