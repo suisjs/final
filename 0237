@@ -1,12 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h> 
-#include <conio.h>  
-#include <time.h>      
-#include <windows.h>  
-
-#define WIDTH 30   // 寬度
-#define HEIGHT 10  // 高度
-
 // 繪製遊戲畫面的函式
 void drawGame(int ballHeight, int obstaclePos, int obstaclePattern, double elapsedTime, int score)
     {
